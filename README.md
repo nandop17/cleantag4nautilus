@@ -26,24 +26,34 @@ This script works without any installation in Ubuntu, and other OS GNU/Linux wit
 ## INSTALATION
 ====================================================================
 Ubuntu 13.04 and later versions include nautilus-actions by default, for previous versions:
-	# sudo apt-get install nautilus-actions
+$ sudo apt-get install nautilus-actions
+
 
 Step 1:
-	Download the script in some folder. I.e: /home/$USER/scripts/cleantag4nautilus/
+Download the script in some folder. I.e: /home/$USER/scripts/cleantag4nautilus/
+
+
 Step 2:
-	Give the permission to execute the script
-	# chmod +x /home/$USER/scripts/cleantag4nautilus/cleantag4nautilus
+Give the permission to execute the script
+$ chmod +x /home/$USER/scripts/cleantag4nautilus/cleantag4nautilus
+
+
 Step 3:
-	Open nautilus-actions-config-tool
+Open nautilus-actions-config-tool
+
+
 Step 4:
-	Define new action
-	and rename new action to cleantag4nautilus
+Define new action and rename new action to cleantag4nautilus
+
+
 Step 5:
-	In Command tab enter:
-		Path: /home/$USER/scripts/cleantag4nautilus/cleantag4nautilus
-		Parameters: %f
+In Command tab enter:
+Path: /home/$USER/scripts/cleantag4nautilus/cleantag4nautilus
+Parameters: %f
+
+
 Step 6:
-	In Command tab edit basename filter * to *.mp3
+In Command tab edit basename filter * to *.mp3
 
 
 
