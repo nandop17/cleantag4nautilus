@@ -6,7 +6,7 @@ Cleantag4nautilus is a bash script which is used to rename music files massively
 
 
 
-## DESCRIPTION
+DESCRIPTION
 ====================================================================
 Normalize with one click all your music files names to new and clean name without weird words, i.e. information about the download web.
 For the time being, it is used for mp3, wma and m4a files.
@@ -14,7 +14,7 @@ For the time being, it is used for mp3, wma and m4a files.
 
 
 
-## REQUERIMENTS
+REQUERIMENTS
 ====================================================================
 This program is bash script, therefore it can work in Linux and other Unix OS based.
 Nautilus, and zenity packages are also requeriments.
@@ -23,10 +23,12 @@ This script works without any installation in Ubuntu, and other OS GNU/Linux wit
 
 
 
-## INSTALATION
+INSTALATION
 ====================================================================
 Ubuntu 13.04 and later versions include nautilus-actions by default, for previous versions:
+
 $ sudo apt-get install nautilus-actions
+
 
 
 Step 1:
@@ -57,7 +59,7 @@ In Command tab edit basename filter * to *.mp3
 
 
 
-## USE
+USE
 ====================================================================
 Right click over the mp3 file, select Nautilus-Actions actions, and select cleantag4nautilus. Enjoy it!!
 
