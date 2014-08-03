@@ -245,7 +245,7 @@ newName="$newName$basename"
 if [ $error -gt 0 ];then
 	echo "++ Error for \" $name \" >>>> $errorMessage " >> "$log"
 	# echo "newName=\"\$(zenity --entry --title=\"Cleantag\" --width=500 --text=\"$mensaje_error\\n<<$nombre>>\\n\\nIntroduzca el nombre manualmente\" --entry-text=\"$nombremod\")\""
-	newName="$(zenity --entry --title="Cleantag4nautilus" --width=500 --text="$errorMessage\n<<$nombre>>\n\nIntroduce manually the new name" --entry-text="$newName")"
+	newName="$(zenity --entry --title="Cleantag4nautilus" --width=500 --text="$errorMessage\n<<$name>>\n\nIntroduce manually the new name" --entry-text="$newName")"
 fi
 
 
