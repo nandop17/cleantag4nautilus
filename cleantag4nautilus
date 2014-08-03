@@ -1,0 +1,324 @@
+#!/bin/bash
+## Fernando Illán López-Rey 
+## Email nandopolan@gmail.com
+## CleanTag for Nautilus with Zenity GUI
+
+
+##--------------------------------------------------------------------
+function cleanTag {
+
+echo "# $name"
+error=0
+errorMessage=""
+newName="$name"
+
+##CLEANTAG CORE START HERE#########################################################################
+###################################################################################################
+until false;do 
+
+
+##FILTER [code to character]
+# you see more character in http://www.w3schools.com/tags/ref_entities.asp
+newName=$(echo "$newName" | sed 's/%26/%/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*225;/á/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*233;/é/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*237;/í/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*243;/ó/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*250;/ú/g')
+
+newName=$(echo "$newName" | sed 's/%[0-9]*246;/ö/g')
+newName=$(echo "$newName" | sed 's/%[0-9]*36;/$/g')
+
+newName=$(echo "$newName" | sed "s/%[0-9]*39;/\'/g")
+newName=$(echo "$newName" | sed "s/%[0-9]*40;/(/g")
+newName=$(echo "$newName" | sed "s/%[0-9]*41;/)/g")
+newName=$(echo "$newName" | sed 's/%amp;/\&/g')
+
+newName=$(echo "$newName" | sed 's/%[0-9]*\|%//g')
+newName=$(echo "$newName" | sed 's/;//g')
+#echo "$newName"
+
+
+##EDIT [lowercase for every letter]
+newName=$(echo "$newName" | tr A-Z a-z)
+#echo "$newName"
+
+
+##FILTER [delete basename]
+# get file basename
+filter=$(echo "$name" | grep -e '.mp3' -e '.Mp3' -e '.MP3')
+if [ ! "$filter" = "" ];then
+	basename=".mp3"
+else
+	filter=$(echo "$name" | grep -e '.wma' -e '.Wma' -e '.WMA')
+	if [ ! "$filter" = "" ];then
+		basename=".wma"
+	else
+		filter=$(echo "$name" | grep -e '.m4a' -e '.M4a' -e '.M4A')
+		if [ ! "$filter" = "" ];then
+			basename=".m4a"
+		fi	
+	fi
+fi
+# delete basename
+newName=$(echo "$newName" | sed 's/\.mp3$\|\.wma$\|\.m4a$//')
+#echo "$newName"
+
+
+##FILTER [delete number, space and/or hyphen until first letter]
+newName=$(echo "$newName" | sed 's/^ //')
+newName=$(echo "$newName" | sed 's/^[0-9]*//')
+newName=$(echo "$newName" | sed 's/^ //')
+newName=$(echo "$newName" | sed 's/^-//')
+newName=$(echo "$newName" | sed 's/^ //')
+#echo "$newName"
+
+
+##FILTER [delete webpage and/or more dirty names]
+newName=$(echo "$newName" | sed 's/- \[.*//')
+newName=$(echo "$newName" | sed 's/- %.*//')
+newName=$(echo "$newName" | sed 's/(www.*//')
+newName=$(echo "$newName" | sed 's/www.*//')
+newName=$(echo "$newName" | sed 's/\[.*//')
+newName=$(echo "$newName" | sed 's/([0-9]*)//')
+newName=$(echo "$newName" | sed 's/(copia)//g')
+newName=$(echo "$newName" | sed 's/- copia//g')
+newName=$(echo "$newName" | sed 's/copia//g')
+newName=$(echo "$newName" | sed 's/(copy)//g')
+newName=$(echo "$newName" | sed 's/- copy//g')
+newName=$(echo "$newName" | sed 's/copy//g')
+newName=$(echo "$newName" | sed 's/ $//')
+newName=$(echo "$newName" | sed 's/-$//')
+newName=$(echo "$newName" | sed 's/ $//')
+newName=$(echo "$newName" | sed 's/ @\|@//g')
+newName=$(echo "$newName" | sed 's/\.\.\.*/./g')	#replace two or more dots into one
+#echo "$newName"
+
+
+##CHECK AND SPLIT [split if there be one hyphen or triple space]
+newName=$(echo "$newName" | sed 's/_/ /g')
+
+spaces=$(echo "$newName" | tr -cd ' ' | wc -c)
+hyphens=$(echo "$newName" | tr -cd '-' | wc -c)
+dots=$(echo "$newName" | tr -cd '.' | wc -c)
+#if there not be spaces and there be two hyphens or more then hyphens will be replaced into spaces
+if [ $spaces -eq 0 ] && [ $hyphens -ge 2 ];then	
+	newName=$(echo "$newName" | sed 's/-/ /g')
+	spaces=$(echo "$newName" | tr -cd ' ' | wc -c)
+	hyphens=0
+fi
+#if there not be spaces and there be two hyphens or more then dots will be replaced into spaces
+if [ $spaces -eq 0 ] && [ $dots -ge 2 ];then	
+	newName=$(echo "$newName" | sed 's/\./ /g')
+	spaces=$(echo "$newName" | tr -cd ' ' | wc -c)
+	dots=0
+fi
+
+
+newName=$(echo "$newName" | sed 's/   /'+'/g')
+tripleSpace=$(echo "$newName" | tr -cd '+' | wc -c)
+newName=$(echo "$newName" | sed 's/  / /g')		#replace two spaces into one
+newName=$(echo "$newName" | sed 's/+/   /g')
+#echo -e "tripleSpace=$tripleSpace\nhyphens=$hyphens"
+
+
+if [ $tripleSpace -eq 0 ];then
+	if [ $hyphens -eq 0 ];then
+		error=1
+		errorMessage="ERROR: There is no hyphen" 
+		# echo $errorMessage
+		break
+	fi
+	if [ $hyphens -eq 1 ];then
+		author=$(echo ${newName%-*})
+		title=$(echo ${newName#*-})
+	fi
+	if [ $hyphens -eq 2 ];then
+		newName=$(echo "$newName" | sed 's/-/%hyphen%/')
+		author=$(echo ${newName%-*})
+		author=$(echo "$author" | sed 's/%hyphen%/-/')
+		title=$(echo ${newName#*-})
+	fi
+	if [ $hyphens -ge 3 ];then	
+		error=1
+		errorMessage="ERROR: There are too many hyphens"
+		# echo $errorMessage
+		break
+	fi
+fi
+
+if [ $tripleSpace -eq 1 ];then
+	if [ $hyphens -eq 0 ];then
+		newName=$(echo "$newName" | sed 's/   / - /')
+		author=$(echo ${newName%-*})
+		title=$(echo ${newName#*-})
+	fi
+	if [ $hyphens -ge 1 ];then
+		error=1
+		errorMessage="ERROR: There is triple space in addition to hyphen"
+		# echo $errorMessage
+		break
+	fi
+fi
+
+if [ $tripleSpace -ge 2 ];then	
+	error=1
+	errorMessage="ERROR: There are at least two triple space"
+	# echo $errorMessage
+	break
+fi
+#echo "$newName"
+
+
+##########CHECKS
+longAuthor=$(echo "$author" | wc -c)
+if [ $longAuthor -le 2 ];then
+	error=1
+	errorMessage="ERROR: Author name too short"
+	# echo $errorMessage
+	break
+fi
+longTitle=$(echo "$title" | wc -c)
+if [ $longTitle -le 2 ];then
+	error=1
+	errorMessage="ERROR: Title too short"
+	# echo $errorMessage
+	break
+fi
+
+
+##FILTER [delete after last close parenthesis]
+title=$(echo "$title" | sed 's/).*/)/')
+
+##JOIN []
+newName="$author - $title"
+#echo "$newName"
+
+
+break
+done
+##End of Until  ###################################################
+
+
+##FILTER [spaces between hyphens and parenthesis]
+newName=$(echo "$newName" | sed 's/  (\| (\|(/ (/g')
+newName=$(echo "$newName" | sed 's/ )/)/g')
+#echo "$newName"
+
+
+##FILTER [uppercase for each word first letter]
+newName=$(echo "$newName" | sed 's/^./\u&/')
+newName=$(echo "$newName" | sed 's/ [a-z]/\U&/g')
+newName=$(echo "$newName" | sed 's/([a-z]/\U&/g')
+newName=$(echo "$newName" | sed 's/-[a-z]/\U&/g')
+newName=$(echo "$newName" | sed 's/\.[a-z]/\U&/g')
+#echo "$newName"
+
+
+##FILTER [replace miscellaneous]
+newName=$(echo "$newName" | sed 's/Featuring\|Feat\.\|Feat\|Ft\.\|Ft/Ft./')
+newName=$(echo "$newName" | sed 's/Vs\.\|Vs/vs./')
+
+openParenthesis=$(echo "$newName" | tr -cd '(' | wc -c)
+closeParenthesis=$(echo "$newName" | tr -cd ')' | wc -c)
+if [ $openParenthesis -gt $closeParenthesis ];then
+	newName=$(echo "$newName" | sed 's/$/)/')
+fi
+if [ $openParenthesis -lt $closeParenthesis ];then
+	newName=$(echo "$newName" | sed 's/[A-Z][a-z]* Remix)$\|[A-Z][a-z]* Mix)$\|[A-Z][a-z]*)$/(&/')
+fi
+#echo "$newName"
+
+
+##JOIN [at the end the basename is joined]
+newName="$newName$basename"
+#echo "$newName"
+
+
+
+##################################################################################################
+#######################################################################CLEANTAG CORE FINISH HERE##
+
+
+
+##ENTER MANUAL NAME
+if [ $error -gt 0 ];then
+	echo "++ Error for \" $name \" >>>> $errorMessage " >> "$log"
+	# echo "newName=\"\$(zenity --entry --title=\"Cleantag\" --width=500 --text=\"$mensaje_error\\n<<$nombre>>\\n\\nIntroduzca el nombre manualmente\" --entry-text=\"$nombremod\")\""
+	newName="$(zenity --entry --title="Cleantag4nautilus" --width=500 --text="$errorMessage\n<<$nombre>>\n\nIntroduce manually the new name" --entry-text="$newName")"
+fi
+
+
+
+
+
+
+} #End of function cleantag
+
+
+##---------------------------------------------------------------------
+
+
+function replaceTag {
+
+	mv "${name}" "${newName}"
+}
+
+
+
+
+
+
+##---------------------------------------------------------------------
+###START#############################################################
+
+
+
+## create directory process log
+if [ ! -d "$HOME/.cleantag" ];then
+	mkdir "$HOME/.cleantag"
+fi
+
+logFile="$(date +%c)"
+
+
+
+## GLOBAL VARIABLES
+pathName="$@"
+name=""
+newName=""
+path="$PWD"
+basename=".mp3"
+log="$HOME/.cleantag/$logFile"
+
+## create log and introduce the path
+if [ ! -f "$log" ];then
+	echo -e "$path\n\n" >> "$log"
+fi
+
+
+
+##---------------------------------------------------------------------
+
+
+# delete file path
+name=$(echo "$pathName" | sed 's/\/$//')
+name=$(echo "$name" | sed 's/.*\///g')
+
+
+# execute cleantag >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+cleanTag
+replaceTag
+
+echo "$name" >> "$log"
+echo "$newName" >> "$log"
+
+
+# print result
+zenity --info --title="Cleantag4nautilus" --timeout 2 --text="Old name:  $name \n\nNew name:  $newName"
+
+
+
+
