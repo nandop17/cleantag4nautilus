@@ -23,7 +23,7 @@ This script works without any installation in Ubuntu, and other OS GNU/Linux wit
 
 
 
-INSTALATION
+INSTALLATION
 ====================================================================
 Ubuntu 13.04 and later versions include nautilus-actions by default, for previous versions:
 
