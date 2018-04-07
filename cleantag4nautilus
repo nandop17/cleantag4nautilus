@@ -17,6 +17,8 @@ newName="$name"
 until false;do 
 
 
+
+
 ##FILTER [code to character]
 # you see more character in http://www.w3schools.com/tags/ref_entities.asp
 newName=$(echo "$newName" | sed 's/%26/%/g')
@@ -65,6 +67,7 @@ newName=$(echo "$newName" | sed 's/\.mp3$\|\.wma$\|\.m4a$//')
 #echo "$newName"
 
 
+
 ##FILTER [delete number, space and/or hyphen until first letter]
 newName=$(echo "$newName" | sed 's/^ //')
 newName=$(echo "$newName" | sed 's/^[0-9]*//')
@@ -92,6 +95,20 @@ newName=$(echo "$newName" | sed 's/-$//')
 newName=$(echo "$newName" | sed 's/ $//')
 newName=$(echo "$newName" | sed 's/ @\|@//g')
 newName=$(echo "$newName" | sed 's/\.\.\.*/./g')	#replace two or more dots into one
+newName=$(echo "$newName" | sed 's/(official music video)//g')
+newName=$(echo "$newName" | sed 's/official music video//g')
+newName=$(echo "$newName" | sed 's/(official video)//g')
+newName=$(echo "$newName" | sed 's/official video//g')
+newName=$(echo "$newName" | sed 's/(lyric video)//g')
+newName=$(echo "$newName" | sed 's/lyric video//g')
+newName=$(echo "$newName" | sed 's/(official audio)//g')
+newName=$(echo "$newName" | sed 's/official audio//g')
+newName=$(echo "$newName" | sed 's/(lyrics)//g')
+newName=$(echo "$newName" | sed 's/lyrics//g')
+newName=$(echo "$newName" | sed 's/(audio)//g')
+
+
+
 #echo "$newName"
 
 
@@ -261,6 +278,20 @@ fi
 
 function replaceTag {
 
+	##Change MP3 tags
+	author=$(echo "$author" | sed 's/^./\u&/')
+	author=$(echo "$author" | sed 's/ [a-z]/\U&/g')
+	author=$(echo "$author" | sed 's/([a-z]/\U&/g')
+	author=$(echo "$author" | sed 's/-[a-z]/\U&/g')
+	author=$(echo "$author" | sed 's/\.[a-z]/\U&/g')
+	title=$(echo "$title" | sed 's/^./\u&/')
+	title=$(echo "$title" | sed 's/ [a-z]/\U&/g')
+	title=$(echo "$title" | sed 's/([a-z]/\U&/g')
+	title=$(echo "$title" | sed 's/-[a-z]/\U&/g')
+	title=$(echo "$title" | sed 's/\.[a-z]/\U&/g')
+	eyeD3 -a "${author}" -t "${title}" "${name}"
+	
+	##Change name of file
 	mv "${name}" "${newName}"
 }
 
